@@ -1,2 +1,4 @@
 %Bootcamp HW1
-%Question 1 
+%Question 1 Fibonacci Series upto 10 terms
+n1 = 0;
+n2 = 1;
