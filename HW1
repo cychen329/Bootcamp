@@ -1,4 +1,55 @@
 %Bootcamp HW1
 %Question 1 Fibonacci Series upto 10 terms
-n1 = 0;
-n2 = 1;
+#HW1
+#Problem 1 (Fibonacci Series up to 10 terms)
+n1 = 0 #let the first term be 0
+n2 = 1 #let the second term be 1
+terms = 10 #There are 10 terms in total
+
+print("Fibonacci Series up to 10 terms:")
+for _ in range(terms): #so this will repeat 10 times since terms=10
+    print (n1, end=" ") #it will print the first term up to the whatever the last term is
+    next_term = n1 +n2 #the next term is defined by the sum of previous two terms
+    n1 = n2 #the new first term is replaced by the previous second term
+    n2 = next_term #the new second term is the sum of the previous two terms. n3 is n2 and following.
+
+#Problem 2 (Display numbers at the odd indices of a list)
+a = list(range(11)) #we define a list that is from 0 to 10
+print(a[1:11:2]) #it starts at 1, ends at 11, and jump by 2
+
+#Problem 3 (string)
+string = """
+My international student journey. I started my international student journey since I was 16,
+I participated the exchange student program for a year, after that I decided to keep studying in the US.
+I went to Washington state for community college, and finished my bachelor degree in UC,San Diego. 
+After finished my bachelor degree, I went back home to work and realized that I want to study engineering.
+In the end, I decided to study my master in NYU, I'm very satisfied with my choice.
+Overall, I like every part of my educational journey in the US, they all give me good experience."""
+
+#Problem 4 (Vowel Function)
+def count_vowels(word):
+    vowels = "aeiouAEIOU"  # Define vowels both uppercase and lowercase
+    count = sum(1 for char in word if char in vowels)  # Count vowels
+    return count
+word = input("Enter a word: ")  # Ask the word input
+print(f"Number of vowels in '{word}': {count_vowels(word)}")
+
+#Problem 5 (print each one in all caps.)
+animals = ['tiger', 'elephant', 'monkey', 'zebra', 'panther'] #Define the list called animals, that includes several animals
+for animal in animals:
+    print(animal.upper()) #that will make every iteration in uppercase.
+
+#Problem 6 (Write a program that iterates from 1 to 20, printing each number and whether it's odd or even.)
+for num in range (1,21):  #This give numbers 1-20
+    if num %2 ==0: #If the remainder is 0, print the number is even
+        print(str(num) + "is even")
+    else: #anything besides even number are odd number
+        print(str(num) + "is odd")
+
+#Problem 7 (Write a function sum_of_integers(a, b) that takes two integers as input from the user and returns their sum)
+def sum_of_integers(a,b): #define the function that gives result of a + b
+    return a+b
+number_1 = int(input("Your choice of first integer")) #Ask the number and make the choice become integer type
+number_2 = int(input("Your choice of second integer"))
+result = sum_of_integers(number_1,number_2)
+print(str(number_1)+" + "+str(number_2)+" is "+str(result))
