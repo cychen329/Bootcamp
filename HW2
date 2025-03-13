@@ -1,1 +1,46 @@
+#Bootcamp HW2
+import numpy as np
+#Part 1-Numpy
+url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
+iris_2d = np.genfromtxt(url, delimiter=',', dtype='float', usecols=[0,1,2,3])
+#1 Define two custom numpy arrays
+a = np.array([1,2,3,4,5,6]) #define a array
+b = np.array([3,4,5,6,7,8]) #define b array
+c = np.vstack([a,b]) #adding a and b vertically
+print(c)
+d = np.hstack([a,b]) #adding a and b horizontally
+print(d)
 
+#2 Find common elements between a,b
+common = np.intersect1d(a,b) #Using the intersect1d function to find common elements
+print(common)
+
+#3 ⁠Extract all numbers from A which are within a specific range.
+ex = a[0:4] #Giving the range from first index to fourth index, not included the fifth which is 4 in coding
+print(ex)
+
+#4 Filter the rows of iris_2d that has petallength (3rd column) > 1.5 and sepallength (1st column) < 5.0
+print(iris_2d[:5]) #View the first 5 rows
+filtered_rows = iris_2d[(iris_2d[:, 2] > 1.5) & (iris_2d[:, 0] < 5.0)] 
+#we are filtering out 3rd colum that has petal length >1.5 and 1st column that has sepal lenth <5.0
+print(filtered_rows)
+
+#Part 2-Panda
+import pandas as pd
+#1.⁠ ⁠From df filter the 'Manufacturer', 'Model' and 'Type' for every 20th row starting from 1st (row 0)
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+filtered_df = filtered_df = df.loc[::20, ['Manufacturer', 'Model', 'Type']]
+print(filtered_df)
+
+#2 ⁠Replace missing values in Min.Price and Max.Price columns with their respective mean.
+df['Min.Price'].fillna(df['Min.Price'].mean(), inplace=True)
+df['Max.Price'].fillna(df['Max.Price'].mean(), inplace=True)
+print(df[['Min.Price', 'Max.Price']])
+
+#3 How to get the rows of a dataframe with row sum > 100?
+df = pd.DataFrame(np.random.randint(10, 40, 60).reshape(-1, 4))
+df = pd.DataFrame(np.random.randint(10, 40, 60).reshape(-1, 4), columns=['A', 'B', 'C', 'D']) #Create random Dataframe, name the column as A,B,C, and D 
+row_sum = df.sum(axis=1) #Compute the row sum
+print("\nRow Sums:\n", row_sum) 
+filtered_sum = df[row_sum > 100]#Filter out the sum greatr than 100
+print("\nRows where sum > 100:\n", filtered_sum)
