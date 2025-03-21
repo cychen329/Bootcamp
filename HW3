@@ -1,1 +1,85 @@
+#Bootcamp_HW_3
+import pandas as pd
+import matplotlib.pyplot as plt
+#Problem 1 Filter the data to include only weekdays
+#Load the data set
+url = "https://data.cityofnewyork.us/api/views/6fi9-q3ta/rows.csv?accessType=DOWNLOAD"
+df = pd.read_csv(url)
+#Make sure the data set is loaded correctly
+print(df.head())
+df['hour_beginning'] = pd.to_datetime(df['hour_beginning'], errors='coerce')
+# Convert 'hour_beginning' column to datetime format
+df['hour'] = df['hour_beginning'].dt.hour
+df['month'] = df['hour_beginning'].dt.month
+df['date'] = df['hour_beginning'].dt.date
+df['day_name'] = df['hour_beginning'].dt.day_name()
+#Verify the hour_beginning column is in the right form
+print(df.head())
+# Define weekday names
+weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+# Filter data for weekdays only
+df_weekdays = df[df['day_name'].isin(weekdays)]
+#print("Dataset shape:", df.shape)
+# Check dataset sizes to see if extract the weekdays out
+print("Original dataset shape:", df.shape)
+print("Filtered dataset shape (weekdays only):", df_weekdays.shape)
+# Group Pedestrians by weekday and sum
+weekday_counts = df_weekdays.groupby('day_name')['Pedestrians'].sum()
+# Ensure the weekdays are in the correct order
+weekday_counts = weekday_counts.reindex(weekdays)
+#Plot setting
+plt.figure(figsize=(10, 5))
+plt.plot(weekday_counts.index, weekday_counts.values, marker='o', linestyle='-', color='blue')
+plt.xlabel("Day of the Week")
+plt.ylabel("Total Pedestrians Count")
+plt.title("Pedestrians for Each Weekday")
+plt.grid(True)
+#Plot show
+plt.show()
 
+#Problem 2 Track pedestrian counts on the Brooklyn Bridge for the year 2019, how weather influence.
+#Filter for the year 2019
+df_2019 = df[df['hour_beginning'].dt.year == 2019]
+#Keep the relevant columns and drop missing values
+df_2019 = df_2019[['hour_beginning', 'Pedestrians', 'weather_summary']].dropna()
+#One-hot encode the 'weather_summary' column
+df_encoded = pd.get_dummies(df_2019, columns=['weather_summary'])
+#Create a correlation matrix
+correlation_matrix = df_encoded.corr()
+#Extract only the correlation with 'Pedestrians'
+pedestrian_corr = correlation_matrix[['Pedestrians']].drop('Pedestrians')
+#Plot the correlation results
+plt.figure(figsize=(10, 6))
+pedestrian_corr['Pedestrians'].sort_values(ascending=False).plot(kind='barh', color='cornflowerblue')
+plt.title("Correlation Between Weather Conditions and Pedestrian Counts (2019)")
+plt.xlabel("Correlation with Pedestrian Count")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#3 Custom Function
+# Defind Custom Function
+def categorize_time(hour):
+    if 5 <= hour < 12:
+        return 'Morning'
+    elif 12 <= hour < 17:
+        return 'Afternoon'
+    elif 17 <= hour < 21:
+        return 'Evening'
+    else:
+        return 'Night'
+#Extract hour and apply time of day categorization
+df['time_of_day'] = df['hour'].apply(categorize_time) 
+#Group by time of day and calculate average pedestrian counts
+time_of_day_summary = df.groupby('time_of_day')['Pedestrians'].mean()
+time_of_day_summary = time_of_day_summary.reindex(['Morning', 'Afternoon', 'Evening', 'Night'])
+#Plot the result
+plt.figure(figsize=(8, 5))
+time_of_day_summary.plot(kind='bar', color='orange')
+plt.title("Average Pedestrian Count by Time of Day")
+plt.xlabel("Time of Day")
+plt.ylabel("Average Pedestrian Count")
+plt.xticks(rotation=0)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
