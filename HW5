@@ -1,0 +1,65 @@
+#Bootcamp HW5
+#Preprocess Test data and get predictions in the attached python notebook
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+
+# Load training and test data
+train_df = pd.read_csv("employee.csv")
+test_df = pd.read_csv("employee.csv")  # Replace with new test data if available
+
+# Drop rows with missing target (salary) in training
+train_df = train_df.dropna(subset=['salary'])
+
+# Drop unnecessary columns
+drop_cols = ['id', 'timestamp', 'country']
+X_train = train_df.drop(columns=drop_cols + ['salary'])
+y_train = train_df['salary']
+
+X_test = test_df.drop(columns=drop_cols + ['salary'])
+
+# Define categorical and numerical features
+categorical_features = ['employment_status', 'job_title', 'is_manager',
+                        'education', 'is_education_computer_related', 'certifications']
+numerical_features = ['job_years', 'hours_per_week', 'telecommute_days_per_week']
+
+# Preprocessing for numeric data
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+
+# Preprocessing for categorical data
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+# Combine preprocessing steps
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numerical_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+# Create pipeline with Linear Regression
+pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('model', LinearRegression())
+])
+
+# Fit the pipeline on training data
+pipeline.fit(X_train, y_train)
+
+# Predict on test data
+predictions = pipeline.predict(X_test)
+
+# Add predictions to test DataFrame
+test_df['predicted_salary'] = predictions
+
+# Show results
+print(test_df[['job_title', 'salary', 'predicted_salary']].head())
