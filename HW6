@@ -1,0 +1,32 @@
+#1⁠ ⁠How do you assess the statistical significance of an insight?
+First, fomulate a hypothesis. 
+Second, choose a significant value. 
+Third, choose a appropriate test to perfrom. 
+Fourth, check the p value, and compare to the significant value. 
+Fifth, see the hypothesis should exist or not.
+
+#2 What is the Central Limit Theorem? Explain it. Why is it important?
+When you can a bunch of samples, the averages will start to form a normal distribution, even if the orignal data isn't normal distribution. 
+This is important, because real world data is usually not in normal distribution, but Central Limit Theorem makes the data becoes normal distribution. 
+We can use the normalization distribution data to perform tests, and it can help us to predict our hypothesis.
+
+#3 What is the statistical power?
+Statistical power is the probability that a test will correctly detect a real effect. 
+Example: When you perfrom a data, it tells you reject the null hypothesis when it’s actually false.
+
+#4 How do you control for biases?
+Designing carefully, analyzing objectively, and checking your assumptions.
+
+#5 ⁠What are confounding variables?
+A confounding variable is something that affects both the thing you're testing and the outcome, and it can mess up your results.
+It’s a hidden factor that makes it look like there’s a connection between two things, when really, there isn’t — or not as strong as it seems.
+Example: People who carry lighters are more likely to get lung cancer. (there's no direct relation)
+
+#6 What is A/B testing?
+A/B testing is a way to compare two versions of something to see which one works better.
+
+#7 What are confidence intervals?
+A confidence interval is a range of values that’s likely to contain the true value (like the true average) of something you're measuring.
+Example: Survey a sample of people and find their average height is 170 cm. 
+You calculate a 95% confidence interval: [168 cm, 172 cm]
+It means "We are 95% confident that the true average height of the whole population is between 168 and 172 cm."
