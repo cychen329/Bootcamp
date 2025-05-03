@@ -1,1 +1,242 @@
 #1 Try different thresholds for computing predictions. By default it is 0.5. Use predict_proba function to compute probabilities and then try custom thresholds and see their impact on Accuracy, Precision and Recall
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+glass = pd.read_csv('glass.csv')
+glass.head()
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# Load dataset
+glass = pd.read_csv("glass.csv")
+
+# Create binary target: 1 if Al > median, else 0
+threshold_al = glass['Al'].median()
+glass['Al_High'] = (glass['Al'] > threshold_al).astype(int)
+
+# Define features and target
+X = glass.drop(columns=['Al', 'Al_High'])
+y = glass['Al_High']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
+
+# Scale features
+numeric_features = X.columns.tolist()
+preprocessor = ColumnTransformer([
+    ('num', StandardScaler(), numeric_features)
+])
+
+# Build pipeline
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', LogisticRegression(max_iter=1000))
+])
+
+# Fit model
+pipeline.fit(X_train, y_train)
+
+# Predict probabilities
+proba = pipeline.predict_proba(X_test)[:, 1]
+
+# Evaluate for different thresholds
+thresholds = [0.3, 0.5, 0.7]
+print("Threshold | Accuracy | Precision | Recall")
+print("------------------------------------------")
+for t in thresholds:
+    preds = (proba >= t).astype(int)
+    acc = accuracy_score(y_test, preds)
+    prec = precision_score(y_test, preds)
+    rec = recall_score(y_test, preds)
+    print(f"   {t:.1f}     |  {acc:.3f}  |   {prec:.3f}   |  {rec:.3f}")
+
+#2 Do the same analysis for other columns
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# Load dataset
+glass = pd.read_csv("glass.csv")
+
+# List of numeric columns
+numeric_cols = ['RI', 'Na', 'Mg', 'Al', 'Si', 'K', 'Ca', 'Ba', 'Fe']
+
+results = []
+
+# Loop over each column as target
+for target in numeric_cols:
+    # Create binary target
+    median_val = glass[target].median()
+    glass['target_binary'] = (glass[target] > median_val).astype(int)
+
+    # Use other numeric columns as features
+    feature_cols = [col for col in numeric_cols if col != target]
+    X = glass[feature_cols]
+    y = glass['target_binary']
+
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
+
+    # Preprocessing and model pipeline
+    preprocessor = ColumnTransformer([('num', StandardScaler(), feature_cols)])
+    model = Pipeline([
+        ('preprocessor', preprocessor),
+        ('classifier', LogisticRegression(max_iter=1000))
+    ])
+
+    # Train model
+    model.fit(X_train, y_train)
+    proba = model.predict_proba(X_test)[:, 1]
+
+    # Evaluate at thresholds
+    for threshold in [0.3, 0.5, 0.7]:
+        preds = (proba >= threshold).astype(int)
+        results.append({
+            'Target': target,
+            'Threshold': threshold,
+            'Accuracy': accuracy_score(y_test, preds),
+            'Precision': precision_score(y_test, preds, zero_division=0),
+            'Recall': recall_score(y_test, preds)
+        })
+
+# Convert results to DataFrame
+results_df = pd.DataFrame(results)
+
+# Display results
+print(results_df)
+
+#3 Fit a Logistic Regression Model on all features. Remember to preprocess data(eg. normalization and one hot encoding)
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+
+# Load dataset
+df = pd.read_csv("your_dataset.csv")  # Replace with your file
+
+# Example: Target column (must be binary for logistic regression)
+target = 'your_target_column'  # Replace with your actual target
+X = df.drop(columns=[target])
+y = df[target]
+
+# Identify numeric and categorical features
+numeric_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
+categorical_features = X.select_dtypes(include=['object', 'bool', 'category']).columns.tolist()
+
+# Preprocessing pipelines
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('encoder', OneHotEncoder(handle_unknown='ignore'))
+])
+
+# Combine preprocessing
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+# Create full pipeline with Logistic Regression
+clf = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('classifier', LogisticRegression(max_iter=1000))
+])
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
+
+# Train model
+clf.fit(X_train, y_train)
+
+# Evaluate
+accuracy = clf.score(X_test, y_test)
+print(f"Test Accuracy: {accuracy:.3f}")
+
+#4 Plot ROC Curves for each model
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import roc_curve, roc_auc_score
+
+# Load the dataset
+glass = pd.read_csv("glass.csv")
+
+# Target columns to analyze
+target_columns = ['RI', 'Na', 'Mg', 'Si', 'K', 'Ca', 'Ba', 'Fe']
+
+# Store ROC curve data
+roc_data = []
+
+for target in target_columns:
+    # Create binary classification target
+    median_val = glass[target].median()
+    glass['target_binary'] = (glass[target] > median_val).astype(int)
+
+    # Define features (exclude the target being predicted)
+    feature_cols = [col for col in target_columns + ['Al'] if col != target]
+    X = glass[feature_cols]
+    y = glass['target_binary']
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
+
+    # Preprocessing and model pipeline
+    preprocessor = ColumnTransformer([('num', StandardScaler(), feature_cols)])
+    model = Pipeline([
+        ('preprocessor', preprocessor),
+        ('classifier', LogisticRegression(max_iter=1000))
+    ])
+
+    # Train and predict
+    model.fit(X_train, y_train)
+    proba = model.predict_proba(X_test)[:, 1]
+
+    # Compute ROC curve
+    fpr, tpr, _ = roc_curve(y_test, proba)
+    auc = roc_auc_score(y_test, proba)
+
+    # Store results
+    roc_data.append({'target': target, 'fpr': fpr, 'tpr': tpr, 'auc': auc})
+
+# Plot all ROC curves
+plt.figure(figsize=(10, 7))
+for entry in roc_data:
+    plt.plot(entry['fpr'], entry['tpr'], label=f"{entry['target']} (AUC = {entry['auc']:.2f})")
+
+plt.plot([0, 1], [0, 1], 'k--', label="Random Guessing")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curves for Each Feature")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
